@@ -342,6 +342,14 @@ function renderHoje() {
   }).join('');
 }
 
+function parseBrands(subject) {
+  const m = (subject||'').match(/-\s*(\d+)\s*marca/i);
+  return m ? parseInt(m[1]) : 1;
+}
+function totalBrands(acts) {
+  return acts.reduce((s,a) => s + parseBrands(a.subject), 0);
+}
+
 function renderDayCard(analyst, acts, dayClass) {
   const raw = cachedRaw[analyst.userId];
   const isErr = raw instanceof Error;
@@ -349,7 +357,7 @@ function renderDayCard(analyst, acts, dayClass) {
   let badge;
   if (isErr) badge = `<span class="badge" style="background:var(--red-bg);color:var(--red)">erro</span>`;
   else if (!acts.length) badge = `<span class="badge" style="background:var(--green-bg);color:var(--green)">livre</span>`;
-  else badge = `<span class="badge" style="background:var(--amber-bg);color:var(--amber)">${acts.length}</span>`;
+  else badge = `<span class="badge" style="background:var(--amber-bg);color:var(--amber)">${acts.length} atv</span>`;
 
   let body;
   if (isErr) body = `<div class="empty" style="color:var(--red)">${raw.message}</div>`;
@@ -359,9 +367,11 @@ function renderDayCard(analyst, acts, dayClass) {
     const t = act.type ? `<span class="type-tag">${act.type}</span>` : '';
     const deal = act.deal_title || act.org_name || '';
     const dealHtml = deal ? `<span class="deal-name" title="${deal}">· ${deal}</span>` : '';
+    const brands = parseBrands(act.subject);
+    const brandsHtml = `<span style="background:#EDEAFC;color:#5046B4;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">${brands} 🏷</span>`;
     return `<div class="act-item ${dayClass}" title="${s}">
       <div class="act-title">${s}</div>
-      <div class="act-meta">${t}${dealHtml}</div>
+      <div class="act-meta">${t}${brandsHtml}${dealHtml}</div>
     </div>`;
   }).join('')}</div>`;
 
@@ -395,27 +405,29 @@ function renderAcomp() {
       const d = (a.marked_as_done_time || a.update_time || '').substring(0,10);
       return isInPeriod(d);
     });
-    return { analyst, count: doneActs.length, acts: doneActs };
+    return { analyst, count: doneActs.length, brands: totalBrands(doneActs), acts: doneActs };
   });
-  const counts = [...allCounts].sort((a,b) => b.count - a.count);
+  const counts = [...allCounts].sort((a,b) => b.brands - a.brands);
 
   const total = counts.reduce((s,c) => s+c.count, 0);
+  const totalBrandsAll = counts.reduce((s,c) => s+c.brands, 0);
   const active = counts.filter(c => c.count > 0).length;
-  const max = counts[0]?.count || 1;
+  const max = counts[0]?.brands || 1;
 
   document.getElementById('m-total').textContent = total;
   document.getElementById('m-leader').textContent = counts[0]?.count > 0 ? counts[0].analyst.name : '—';
-  document.getElementById('m-leader-count').textContent = counts[0]?.count > 0 ? `${counts[0].count} atividades` : '—';
+  document.getElementById('m-leader-count').textContent = counts[0]?.count > 0 ? `${counts[0].brands} marcas` : '—';
   document.getElementById('m-active').textContent = active;
 
   // Bar chart (original order: Nicolas, Brendon, Pedro, Lucas)
-  const chartMax = Math.max(...allCounts.map(c => c.count), 1);
+  const chartMax = Math.max(...allCounts.map(c => c.brands), 1);
   document.getElementById('chart-bars').innerHTML = allCounts.map(c => {
-    const pct = chartMax > 0 ? Math.round((c.count/chartMax)*100) : 0;
+    const pct = chartMax > 0 ? Math.round((c.brands/chartMax)*100) : 0;
     const barH = Math.max(pct, 3);
     return `<div class="chart-col">
       <div class="chart-bar-wrap">
-        <div class="chart-val">${c.count}</div>
+        <div class="chart-val">${c.brands} 🏷</div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">${c.count} atv</div>
         <div class="chart-bar" style="height:${barH}%;background:${c.analyst.avatarColor};opacity:0.85"></div>
       </div>
       <div class="chart-label">${c.analyst.name}</div>
@@ -424,7 +436,7 @@ function renderAcomp() {
 
   const posClass = ['p1','p2','p3',''];
   document.getElementById('ranking-grid').innerHTML = counts.map((c,i) => {
-    const pct = max > 0 ? Math.round((c.count/max)*100) : 0;
+    const pct = max > 0 ? Math.round((c.brands/max)*100) : 0;
     return `<div class="rank-card ${i===0 && c.count>0 ? 'gold' : ''}">
       <div class="rank-pos ${posClass[i]||''}">${i+1}</div>
       <div class="rank-info">
@@ -432,7 +444,7 @@ function renderAcomp() {
         <div class="rank-role">${c.analyst.role}</div>
         <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%"></div></div>
       </div>
-      <div class="rank-count">${c.count}<small>concluídas</small></div>
+      <div class="rank-count">${c.brands}<small>🏷 marcas</small><small style="color:var(--text3)">${c.count} atv</small></div>
     </div>`;
   }).join('');
 
