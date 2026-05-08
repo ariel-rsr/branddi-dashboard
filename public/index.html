@@ -157,14 +157,20 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
     </select>
   </div>
   <div class="summary-row">
-    <div class="metric green"><div class="m-label">Total concluídas</div><div class="m-value" id="m-total">—</div><div class="m-sub" id="m-period-label">este mês</div></div>
-    <div class="metric blue"><div class="m-label">Líder do período</div><div class="m-value" id="m-leader" style="font-size:15px;line-height:1.4;padding-top:3px">—</div><div class="m-sub" id="m-leader-count">—</div></div>
-    <div class="metric purple"><div class="m-label">Analistas ativos</div><div class="m-value" id="m-active">—</div><div class="m-sub">com atividade</div></div>
+    <div class="metric green"><div class="m-label">Total atividades</div><div class="m-value" id="m-total">—</div><div class="m-sub" id="m-period-label">este mês</div></div>
+    <div class="metric purple"><div class="m-label">Total marcas</div><div class="m-value" id="m-total-brands" style="color:#5046B4">—</div><div class="m-sub" id="m-period-label2">este mês</div></div>
+    <div class="metric blue"><div class="m-label">Média marcas/atv</div><div class="m-value" id="m-avg-brands" style="color:#1858A0">—</div><div class="m-sub">no período</div></div>
+    <div class="metric" style="border-color:#EF9F27"><div class="m-label">% concluído hoje</div><div class="m-value" id="m-pct-today" style="color:#B87418">—</div><div class="m-sub">das atv de hoje</div></div>
+    <div class="metric" style="border-color:#E24B4A"><div class="m-label">Atrasadas</div><div class="m-value" id="m-overdue" style="color:#CC4A39">—</div><div class="m-sub">prazo vencido</div></div>
     <div class="metric" style="border-color:#D4A847"><div class="m-label">Apresentações</div><div class="m-value" id="m-ppts" style="color:#B87418">—</div><div class="m-sub">elaboradas no período</div></div>
   </div>
   <div class="chart-wrap">
-    <div class="chart-title">Atividades concluídas por analista</div>
+    <div class="chart-title">Resultado por atividade</div>
     <div class="chart-bars" id="chart-bars"><div class="loading">Carregue os dados primeiro</div></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Resultado por marca</div>
+    <div class="chart-bars" id="chart-bars-brands"><div class="loading">Carregue os dados primeiro</div></div>
   </div>
   <div class="section-title">Ranking do período</div>
   <div class="ranking-grid" id="ranking-grid">
@@ -387,9 +393,11 @@ function renderDayCard(analyst, acts, dayClass) {
 
 function renderAcomp() {
   const labels = { this_month:'este mês', last_month:'mês anterior', this_week:'esta semana' };
-  document.getElementById('m-period-label').textContent = labels[document.getElementById('period-sel').value] || 'este mês';
+  const periodLabel = labels[document.getElementById('period-sel').value] || 'este mês';
+  document.getElementById('m-period-label').textContent = periodLabel;
+  document.getElementById('m-period-label2').textContent = periodLabel;
 
-  // Presentations: elaborar_apresentacao done in period from Nicolas account
+  // Presentations
   const niRaw = cachedRaw[USER_NI] || [];
   const ppts = Array.isArray(niRaw) ? niRaw.filter(a => {
     if ((a.type||'').toLowerCase() !== 'elaborar_apresentacao') return false;
@@ -399,7 +407,7 @@ function renderAcomp() {
   }) : [];
   document.getElementById('m-ppts').textContent = ppts.length;
 
-  // Build counts per analyst (unsorted for chart, sorted for ranking)
+  // Build counts per analyst
   const allCounts = ANALYSTS.map(analyst => {
     const doneActs = getAnalystDone(analyst).filter(a => {
       const d = (a.marked_as_done_time || a.update_time || '').substring(0,10);
@@ -411,24 +419,46 @@ function renderAcomp() {
 
   const total = counts.reduce((s,c) => s+c.count, 0);
   const totalBrandsAll = counts.reduce((s,c) => s+c.brands, 0);
-  const active = counts.filter(c => c.count > 0).length;
+  const avg = total > 0 ? (totalBrandsAll / total).toFixed(1) : '—';
   const max = counts[0]?.brands || 1;
 
   document.getElementById('m-total').textContent = total;
-  document.getElementById('m-leader').textContent = counts[0]?.count > 0 ? counts[0].analyst.name : '—';
-  document.getElementById('m-leader-count').textContent = counts[0]?.count > 0 ? `${counts[0].brands} marcas` : '—';
-  document.getElementById('m-active').textContent = active;
+  document.getElementById('m-total-brands').textContent = totalBrandsAll;
+  document.getElementById('m-avg-brands').textContent = avg;
 
-  // Bar chart (original order: Nicolas, Brendon, Pedro, Lucas)
-  const chartMax = Math.max(...allCounts.map(c => c.brands), 1);
+  // % concluído hoje
+  const tod = todayStr();
+  const allPending = ANALYSTS.flatMap(a => getAnalystPending(a));
+  const allDoneToday = ANALYSTS.flatMap(a => getAnalystDone(a).filter(x => (x.marked_as_done_time||x.update_time||'').substring(0,10) === tod));
+  const todayTotal = allPending.filter(a => a.due_date === tod).length + allDoneToday.length;
+  const pctToday = todayTotal > 0 ? Math.round((allDoneToday.length / todayTotal) * 100) : 0;
+  document.getElementById('m-pct-today').textContent = todayTotal > 0 ? pctToday + '%' : '—';
+
+  // Atrasadas
+  const overdue = allPending.filter(a => a.due_date && a.due_date < tod).length;
+  document.getElementById('m-overdue').textContent = overdue;
+
+  // Chart atividades
+  const chartMaxAtv = Math.max(...allCounts.map(c => c.count), 1);
   document.getElementById('chart-bars').innerHTML = allCounts.map(c => {
-    const pct = chartMax > 0 ? Math.round((c.brands/chartMax)*100) : 0;
-    const barH = Math.max(pct, 3);
+    const pct = Math.max(Math.round((c.count/chartMaxAtv)*100), 3);
     return `<div class="chart-col">
       <div class="chart-bar-wrap">
-        <div class="chart-val">${c.brands} 🏷</div>
-        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">${c.count} atv</div>
-        <div class="chart-bar" style="height:${barH}%;background:${c.analyst.avatarColor};opacity:0.85"></div>
+        <div class="chart-val">${c.count}</div>
+        <div class="chart-bar" style="height:${pct}%;background:${c.analyst.avatarColor};opacity:0.85"></div>
+      </div>
+      <div class="chart-label">${c.analyst.name}</div>
+    </div>`;
+  }).join('');
+
+  // Chart marcas
+  const chartMaxBrands = Math.max(...allCounts.map(c => c.brands), 1);
+  document.getElementById('chart-bars-brands').innerHTML = allCounts.map(c => {
+    const pct = Math.max(Math.round((c.brands/chartMaxBrands)*100), 3);
+    return `<div class="chart-col">
+      <div class="chart-bar-wrap">
+        <div class="chart-val">${c.brands}</div>
+        <div class="chart-bar" style="height:${pct}%;background:${c.analyst.avatarColor};opacity:0.85"></div>
       </div>
       <div class="chart-label">${c.analyst.name}</div>
     </div>`;
