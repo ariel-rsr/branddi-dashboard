@@ -150,11 +150,18 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
 
 <div class="tab-content" id="tab-acomp">
   <div class="controls">
-    <select id="period-sel" onchange="renderAcomp()">
+    <select id="period-sel" onchange="onPeriodChange()">
       <option value="this_month">Este mês</option>
       <option value="last_month">Mês anterior</option>
       <option value="this_week">Esta semana</option>
+      <option value="last_week">Semana passada</option>
+      <option value="custom">Período personalizado</option>
     </select>
+    <div id="custom-range" style="display:none;align-items:center;gap:6px;flex-wrap:wrap">
+      <input type="date" id="custom-start" onchange="renderAcomp()" style="font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid #C8C7C1;background:#fff;color:#181816" />
+      <span style="font-size:13px;color:#686863">até</span>
+      <input type="date" id="custom-end" onchange="renderAcomp()" style="font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid #C8C7C1;background:#fff;color:#181816" />
+    </div>
   </div>
   <div class="summary-row">
     <div class="metric green"><div class="m-label">Total atividades</div><div class="m-value" id="m-total">—</div><div class="m-sub" id="m-period-label">este mês</div></div>
@@ -262,6 +269,22 @@ function fmtDateTime(str) { if (!str) return ''; return str.substring(0,10).spli
 function todayStr() { return fmtDate(new Date()); }
 function tomorrowStr() { const d=new Date(); d.setDate(d.getDate()+1); return fmtDate(d); }
 
+function onPeriodChange() {
+  const val = document.getElementById('period-sel').value;
+  const cr = document.getElementById('custom-range');
+  if (val === 'custom') {
+    cr.style.display = 'flex';
+    const now = new Date();
+    if (!document.getElementById('custom-start').value) {
+      document.getElementById('custom-start').value = fmtDate(new Date(now.getFullYear(), now.getMonth(), 1));
+      document.getElementById('custom-end').value = fmtDate(now);
+    }
+  } else {
+    cr.style.display = 'none';
+  }
+  renderAcomp();
+}
+
 function getPeriodDates() {
   const val = document.getElementById('period-sel').value;
   const now = new Date();
@@ -273,6 +296,14 @@ function getPeriodDates() {
     const day = now.getDay()||7;
     start = new Date(now); start.setDate(now.getDate()-day+1);
     end = new Date(now); end.setDate(now.getDate()+(7-day));
+  } else if (val === 'last_week') {
+    const day = now.getDay()||7;
+    start = new Date(now); start.setDate(now.getDate()-day-6);
+    end = new Date(now); end.setDate(now.getDate()-day);
+  } else if (val === 'custom') {
+    const s = document.getElementById('custom-start').value;
+    const e = document.getElementById('custom-end').value;
+    return { start: s || fmtDate(new Date(now.getFullYear(), now.getMonth(), 1)), end: e || fmtDate(now) };
   } else {
     start = new Date(now.getFullYear(), now.getMonth(), 1);
     end = new Date(now.getFullYear(), now.getMonth()+1, 0);
@@ -392,8 +423,16 @@ function renderDayCard(analyst, acts, dayClass) {
 }
 
 function renderAcomp() {
-  const labels = { this_month:'este mês', last_month:'mês anterior', this_week:'esta semana' };
-  const periodLabel = labels[document.getElementById('period-sel').value] || 'este mês';
+  const val = document.getElementById('period-sel').value;
+  const labels = { this_month:'este mês', last_month:'mês anterior', this_week:'esta semana', last_week:'semana passada' };
+  let periodLabel;
+  if (val === 'custom') {
+    const s = document.getElementById('custom-start').value;
+    const e = document.getElementById('custom-end').value;
+    periodLabel = s && e ? `${s.split('-').reverse().join('/')} – ${e.split('-').reverse().join('/')}` : 'personalizado';
+  } else {
+    periodLabel = labels[val] || 'este mês';
+  }
   document.getElementById('m-period-label').textContent = periodLabel;
   document.getElementById('m-period-label2').textContent = periodLabel;
 
@@ -411,7 +450,8 @@ function renderAcomp() {
   const allCounts = ANALYSTS.map(analyst => {
     const doneActs = getAnalystDone(analyst).filter(a => {
       const d = (a.marked_as_done_time || a.update_time || '').substring(0,10);
-      return isInPeriod(d);
+      const t = (a.type||'').toLowerCase();
+      return isInPeriod(d) && t !== 'prazo' && t !== 'deadline';
     });
     return { analyst, count: doneActs.length, brands: totalBrands(doneActs), acts: doneActs };
   });
