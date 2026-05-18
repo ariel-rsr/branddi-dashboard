@@ -227,13 +227,13 @@ const ANALYSTS = [
     urlDone: 'https://brandmonitor.pipedrive.com/activities/list/filter/156175',
     filterPending: (a) => {
       const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['subir_pescaria','elaboracao_material','atualizacao','deadline','refazer'].includes(t)) return false;
-      return s.includes('fr') || s.includes('golpe');
+      if (!['subir_pescaria','elaboracao_material','atualizacao','deadline','refazer','suporte_ppt','suporte_ppt1'].includes(t)) return false;
+      return s.includes('fr') || s.includes('golpe') || t === 'suporte_ppt' || t === 'suporte_ppt1';
     },
     filterDone: (a) => {
       const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['subir_pescaria','elaboracao_material','atualizacao','deadline','refazer'].includes(t)) return false;
-      return s.includes('fr') || s.includes('golpe');
+      if (!['subir_pescaria','elaboracao_material','atualizacao','deadline','refazer','suporte_ppt','suporte_ppt1'].includes(t)) return false;
+      return s.includes('fr') || s.includes('golpe') || t === 'suporte_ppt' || t === 'suporte_ppt1';
     }
   },
   {
