@@ -8,25 +8,14 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #F4F3EF;
-  --surface: #FFFFFF;
-  --surface2: #EEEDE9;
-  --border: #E2E1DC;
-  --border2: #C8C7C1;
-  --text: #181816;
-  --text2: #686863;
-  --text3: #9C9C97;
-  --red: #CC4A39;
-  --red-bg: #FCECEA;
-  --amber: #B87418;
-  --amber-bg: #FDF2DC;
-  --green: #287848;
-  --green-bg: #E5F4EC;
-  --blue: #1858A0;
-  --blue-bg: #E5EFF9;
-  --purple: #5046B4;
-  --r: 10px;
-  --rs: 6px;
+  --bg: #F4F3EF; --surface: #FFFFFF; --surface2: #EEEDE9;
+  --border: #E2E1DC; --border2: #C8C7C1;
+  --text: #181816; --text2: #686863; --text3: #9C9C97;
+  --red: #CC4A39; --red-bg: #FCECEA;
+  --amber: #B87418; --amber-bg: #FDF2DC;
+  --green: #287848; --green-bg: #E5F4EC;
+  --blue: #1858A0; --blue-bg: #E5EFF9;
+  --purple: #5046B4; --r: 10px; --rs: 6px;
 }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 .app { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
@@ -34,10 +23,6 @@ header { display: flex; align-items: flex-start; justify-content: space-between;
 .header-left h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
 .header-left p { font-size: 13px; color: var(--text2); margin-top: 2px; }
 .timestamp { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; align-self: center; }
-.api-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-.api-bar label { font-size: 11px; font-weight: 600; color: var(--text3); font-family: 'DM Mono', monospace; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
-.api-bar input { flex: 1; min-width: 240px; font-family: 'DM Mono', monospace; font-size: 12px; padding: 6px 10px; border-radius: var(--rs); border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; }
-.api-bar input:focus { border-color: var(--border2); }
 button { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 6px 13px; border-radius: var(--rs); border: 1px solid var(--border2); background: var(--surface); color: var(--text); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; transition: background 0.12s; }
 button:hover { background: var(--surface2); }
 button:active { transform: scale(0.98); }
@@ -76,7 +61,7 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
 .spin { display: inline-block; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .error-banner { font-size: 13px; color: var(--red); background: var(--red-bg); border-radius: var(--rs); padding: 10px 14px; margin-bottom: 16px; border: 1px solid #F2C0BB; }
-.controls { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; }
+.controls { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
 .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 24px; }
 .metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; }
 .metric .m-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 6px; }
@@ -90,9 +75,7 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
 .rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
 .rank-card.gold { border-color: #D4A847; }
 .rank-pos { font-size: 20px; font-weight: 600; color: var(--text3); width: 26px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.rank-pos.p1 { color: #C89A20; }
-.rank-pos.p2 { color: #888; }
-.rank-pos.p3 { color: #A0714F; }
+.rank-pos.p1 { color: #C89A20; } .rank-pos.p2 { color: #888; } .rank-pos.p3 { color: #A0714F; }
 .rank-info { flex: 1; min-width: 0; }
 .rank-name { font-size: 14px; font-weight: 600; }
 .rank-role { font-size: 11px; color: var(--text2); margin-top: 1px; }
@@ -128,9 +111,11 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
     <h1>Inteligência Comercial</h1>
     <p>Painel de atividades — Branddi</p>
   </div>
-  <span class="timestamp" id="ts">—</span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="timestamp" id="ts">—</span>
+    <button onclick="loadAll()">↻ Atualizar</button>
+  </div>
 </header>
-
 
 <div id="error-container"></div>
 
@@ -139,15 +124,17 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
   <button class="tab-btn" onclick="switchTab('acomp', this)">📊 Acompanhamento</button>
 </div>
 
+<!-- ABA HOJE -->
 <div class="tab-content active" id="tab-hoje">
   <div class="day-header">Hoje <span></span></div>
   <div class="analysts-grid" id="grid-hoje">
-    <div class="loading" style="grid-column:1/-1">Configure a API key e clique em Carregar</div>
+    <div class="loading" style="grid-column:1/-1"><span class="spin">↻</span> Carregando...</div>
   </div>
   <div class="day-header" style="margin-top:28px">Amanhã <span></span></div>
   <div class="analysts-grid" id="grid-amanha"></div>
 </div>
 
+<!-- ABA ACOMPANHAMENTO -->
 <div class="tab-content" id="tab-acomp">
   <div class="controls">
     <select id="period-sel" onchange="onPeriodChange()">
@@ -163,6 +150,7 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
       <input type="date" id="custom-end" onchange="renderAcomp()" style="font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid #C8C7C1;background:#fff;color:#181816" />
     </div>
   </div>
+
   <div class="summary-row">
     <div class="metric green"><div class="m-label">Total atividades</div><div class="m-value" id="m-total">—</div><div class="m-sub" id="m-period-label">este mês</div></div>
     <div class="metric purple"><div class="m-label">Total marcas</div><div class="m-value" id="m-total-brands" style="color:#5046B4">—</div><div class="m-sub" id="m-period-label2">este mês</div></div>
@@ -171,6 +159,7 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
     <div class="metric" style="border-color:#E24B4A"><div class="m-label">Atrasadas</div><div class="m-value" id="m-overdue" style="color:#CC4A39">—</div><div class="m-sub">prazo vencido</div></div>
     <div class="metric" style="border-color:#D4A847"><div class="m-label">Apresentações</div><div class="m-value" id="m-ppts" style="color:#B87418">—</div><div class="m-sub">elaboradas no período</div></div>
   </div>
+
   <div class="chart-wrap">
     <div class="chart-title">Resultado por atividade</div>
     <div class="chart-bars" id="chart-bars"><div class="loading">Carregue os dados primeiro</div></div>
@@ -179,10 +168,10 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
     <div class="chart-title">Resultado por marca</div>
     <div class="chart-bars" id="chart-bars-brands"><div class="loading">Carregue os dados primeiro</div></div>
   </div>
+
   <div class="section-title">Ranking do período</div>
-  <div class="ranking-grid" id="ranking-grid">
-    <div class="loading">Carregue os dados primeiro</div>
-  </div>
+  <div class="ranking-grid" id="ranking-grid"><div class="loading">Carregue os dados primeiro</div></div>
+
   <div class="section-title">Últimas concluídas por analista</div>
   <div class="done-grid" id="done-grid"></div>
 </div>
@@ -190,100 +179,51 @@ select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 10px;
 </div>
 
 <script>
-const USER_IC = '26246629';
-const USER_NI = '26246640';
-
 const ANALYSTS = [
   {
     id: 'nicolas', name: 'Nicolas', role: 'Qualidade & Organização', initials: 'NI',
-    avatarBg: '#EDEAFC', avatarColor: '#5046B4', userId: USER_NI,
+    avatarBg: '#EDEAFC', avatarColor: '#5046B4',
+    pendingFilterId: null, userId: '26246640', doneFilterId: '156176',
     urlPending: 'https://brandmonitor.pipedrive.com/activities/list/user/26246640',
     urlDone: 'https://brandmonitor.pipedrive.com/activities/list/filter/156176',
-    filterPending: () => true,
-    filterDone: () => true
   },
   {
     id: 'brendon', name: 'Brendon', role: 'Brand Bidding', initials: 'BR',
-    avatarBg: '#E0F5EE', avatarColor: '#0F6E56', userId: USER_IC,
+    avatarBg: '#E0F5EE', avatarColor: '#0F6E56',
+    pendingFilterId: '151167', userId: '26246629', doneFilterId: '156020',
     urlPending: 'https://brandmonitor.pipedrive.com/activities/list/filter/151167',
     urlDone: 'https://brandmonitor.pipedrive.com/activities/list/filter/156020',
-    filterPending: (a) => {
-      const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['subir_pescaria','inserir_conteudo_bb','atualizacao','deadline'].includes(t)) return false;
-      if (s === 'subir pescaria - golpes') return false;
-      return s.includes('brendon') || s.includes('brand bidding') || t === 'subir_pescaria' || t === 'inserir_conteudo_bb';
-    },
-    filterDone: (a) => {
-      const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['subir_pescaria','inserir_conteudo_bb','atualizacao','deadline'].includes(t)) return false;
-      if (s === 'subir pescaria - golpes') return false;
-      return s.includes('brendon') || s.includes('brand bidding') || t === 'subir_pescaria' || t === 'inserir_conteudo_bb';
-    }
   },
   {
     id: 'pedro', name: 'Pedro', role: 'Golpes & Fraudes', initials: 'PE',
-    avatarBg: '#FCECEA', avatarColor: '#CC4A39', userId: USER_IC,
+    avatarBg: '#FCECEA', avatarColor: '#CC4A39',
+    pendingFilterId: '151166', userId: '26246629', doneFilterId: '156175',
     urlPending: 'https://brandmonitor.pipedrive.com/activities/list/filter/151166',
     urlDone: 'https://brandmonitor.pipedrive.com/activities/list/filter/156175',
-    filterPending: (a) => {
-      const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['subir_pescaria','elaboracao_material','atualizacao','deadline','refazer','suporte_ppt','suporte_ppt1'].includes(t)) return false;
-      return s.includes('fr') || s.includes('golpe') || t === 'suporte_ppt' || t === 'suporte_ppt1';
-    },
-    filterDone: (a) => {
-      const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['subir_pescaria','elaboracao_material','atualizacao','deadline','refazer','suporte_ppt','suporte_ppt1'].includes(t)) return false;
-      return s.includes('fr') || s.includes('golpe') || t === 'suporte_ppt' || t === 'suporte_ppt1';
-    }
   },
   {
     id: 'lucas', name: 'Lucas', role: 'VM & BBP', initials: 'LU',
-    avatarBg: '#E5EFF9', avatarColor: '#1858A0', userId: USER_IC,
+    avatarBg: '#E5EFF9', avatarColor: '#1858A0',
+    pendingFilterId: '151162', userId: '26246629', doneFilterId: '156174',
     urlPending: 'https://brandmonitor.pipedrive.com/activities/list/filter/151162',
     urlDone: 'https://brandmonitor.pipedrive.com/activities/list/filter/156174',
-    filterPending: (a) => {
-      const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['elaboracao_material','atualizacao','deadline','refazer'].includes(t)) return false;
-      return s.includes('vm') || s.includes('bbp');
-    },
-    filterDone: (a) => {
-      const s = (a.subject||'').toLowerCase(), t = (a.type||'').toLowerCase();
-      if (!['elaboracao_material','atualizacao','deadline','refazer'].includes(t)) return false;
-      return s.includes('vm') || s.includes('bbp');
-    }
   }
 ];
 
-let cachedRaw = { [USER_NI]: null, [USER_IC]: null };
+let cachedData = {}; // { analystId: { pending: [], done: [], error: null } }
 
-function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
-}
-
+// ── Helpers ────────────────────────────────────────────────────────────────
 function fmtDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDisplay(str) { if (!str) return ''; const [y,m,d]=str.split('-'); return `${d}/${m}/${y}`; }
 function fmtDateTime(str) { if (!str) return ''; return str.substring(0,10).split('-').reverse().join('/'); }
 function todayStr() { return fmtDate(new Date()); }
 function tomorrowStr() { const d=new Date(); d.setDate(d.getDate()+1); return fmtDate(d); }
 
-function onPeriodChange() {
-  const val = document.getElementById('period-sel').value;
-  const cr = document.getElementById('custom-range');
-  if (val === 'custom') {
-    cr.style.display = 'flex';
-    const now = new Date();
-    if (!document.getElementById('custom-start').value) {
-      document.getElementById('custom-start').value = fmtDate(new Date(now.getFullYear(), now.getMonth(), 1));
-      document.getElementById('custom-end').value = fmtDate(now);
-    }
-  } else {
-    cr.style.display = 'none';
-  }
-  renderAcomp();
+function parseBrands(subject) {
+  const m = (subject||'').match(/-\s*(\d+)\s*marca/i);
+  return m ? parseInt(m[1]) : 1;
 }
+function totalBrands(acts) { return acts.reduce((s,a) => s+parseBrands(a.subject), 0); }
 
 function getPeriodDates() {
   const val = document.getElementById('period-sel').value;
@@ -318,24 +258,56 @@ function isInPeriod(dateStr) {
   return d >= start && d <= end;
 }
 
-async function fetchAllForUser(userId) {
-  let all = [], start = 0;
-  while (true) {
-    const url = `/api/activities?userId=${userId}&start=${start}`;
-    const r = await fetch(url);
-    const j = await r.json();
-    if (!j.success) throw new Error(j.error || 'Erro na API');
-    all = all.concat(j.data || []);
-    if (!j.additional_data?.pagination?.more_items_in_collection) break;
-    start += 100;
-    if (all.length > 3000) break;
+function onPeriodChange() {
+  const val = document.getElementById('period-sel').value;
+  const cr = document.getElementById('custom-range');
+  if (val === 'custom') {
+    cr.style.display = 'flex';
+    const now = new Date();
+    if (!document.getElementById('custom-start').value) {
+      document.getElementById('custom-start').value = fmtDate(new Date(now.getFullYear(), now.getMonth(), 1));
+      document.getElementById('custom-end').value = fmtDate(now);
+    }
+  } else {
+    cr.style.display = 'none';
   }
-  return all;
+  renderAcomp();
 }
 
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ── API ────────────────────────────────────────────────────────────────────
+async function fetchByFilter(filterId, done) {
+  const url = `/api/filter?filterId=${filterId}&done=${done ? 1 : 0}`;
+  const r = await fetch(url);
+  const j = await r.json();
+  if (!j.success) throw new Error(j.error || 'Erro na API');
+  return j.data || [];
+}
+
+async function fetchByUser(userId, done) {
+  const url = `/api/filter?userId=${userId}&done=${done ? 1 : 0}`;
+  const r = await fetch(url);
+  const j = await r.json();
+  if (!j.success) throw new Error(j.error || 'Erro na API');
+  return j.data || [];
+}
+
+// ── Data accessors ─────────────────────────────────────────────────────────
+function getAnalystPending(analyst) { return cachedData[analyst.id]?.pending || []; }
+function getAnalystDone(analyst) { return cachedData[analyst.id]?.done || []; }
+function getAnalystError(analyst) { return cachedData[analyst.id]?.error || null; }
+function isLoading(analyst) { return cachedData[analyst.id] === undefined; }
+
+// ── Load ───────────────────────────────────────────────────────────────────
 async function loadAll() {
   document.getElementById('error-container').innerHTML = '';
-  cachedRaw = { [USER_NI]: null, [USER_IC]: null };
+  cachedData = {};
 
   ['grid-hoje','grid-amanha'].forEach(id => {
     document.getElementById(id).innerHTML = '<div class="loading" style="grid-column:1/-1"><span class="spin">↻</span> Carregando...</div>';
@@ -343,9 +315,20 @@ async function loadAll() {
   document.getElementById('ranking-grid').innerHTML = '<div class="loading"><span class="spin">↻</span> Carregando...</div>';
   document.getElementById('done-grid').innerHTML = '';
 
-  await Promise.all([USER_NI, USER_IC].map(async uid => {
-    try { cachedRaw[uid] = await fetchAllForUser(uid); }
-    catch(e) { cachedRaw[uid] = e; }
+  await Promise.all(ANALYSTS.map(async analyst => {
+    try {
+      const [pending, done] = await Promise.all([
+        analyst.pendingFilterId
+          ? fetchByFilter(analyst.pendingFilterId, false)
+          : fetchByUser(analyst.userId, false),
+        analyst.doneFilterId
+          ? fetchByFilter(analyst.doneFilterId, true)
+          : fetchByUser(analyst.userId, true)
+      ]);
+      cachedData[analyst.id] = { pending, done, error: null };
+    } catch(e) {
+      cachedData[analyst.id] = { pending: [], done: [], error: e.message };
+    }
   }));
 
   renderHoje();
@@ -355,62 +338,42 @@ async function loadAll() {
   document.getElementById('ts').textContent = `Atualizado às ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 }
 
-function getAnalystPending(analyst) {
-  const raw = cachedRaw[analyst.userId];
-  if (!raw || raw instanceof Error) return [];
-  return raw.filter(a => (a.done !== true && a.done !== 1) && analyst.filterPending(a));
-}
-
-function getAnalystDone(analyst) {
-  const raw = cachedRaw[analyst.userId];
-  if (!raw || raw instanceof Error) return [];
-  return raw.filter(a => (a.done === true || a.done === 1) && analyst.filterDone(a));
-}
-
+// ── Render: Hoje ───────────────────────────────────────────────────────────
 function renderHoje() {
   const tod = todayStr(), tom = tomorrowStr();
-  document.getElementById('grid-hoje').innerHTML = ANALYSTS.map(a => {
-    const acts = getAnalystPending(a).filter(x => x.due_date === tod);
-    return renderDayCard(a, acts, 'today');
-  }).join('');
-  document.getElementById('grid-amanha').innerHTML = ANALYSTS.map(a => {
-    const acts = getAnalystPending(a).filter(x => x.due_date === tom);
-    return renderDayCard(a, acts, 'tomorrow');
-  }).join('');
-}
-
-function parseBrands(subject) {
-  const m = (subject||'').match(/-\s*(\d+)\s*marca/i);
-  return m ? parseInt(m[1]) : 1;
-}
-function totalBrands(acts) {
-  return acts.reduce((s,a) => s + parseBrands(a.subject), 0);
+  document.getElementById('grid-hoje').innerHTML = ANALYSTS.map(a =>
+    renderDayCard(a, getAnalystPending(a).filter(x => x.due_date === tod), 'today')
+  ).join('');
+  document.getElementById('grid-amanha').innerHTML = ANALYSTS.map(a =>
+    renderDayCard(a, getAnalystPending(a).filter(x => x.due_date === tom), 'tomorrow')
+  ).join('');
 }
 
 function renderDayCard(analyst, acts, dayClass) {
-  const raw = cachedRaw[analyst.userId];
-  const isErr = raw instanceof Error;
+  const err = getAnalystError(analyst);
+  let badge, body;
 
-  let badge;
-  if (isErr) badge = `<span class="badge" style="background:var(--red-bg);color:var(--red)">erro</span>`;
-  else if (!acts.length) badge = `<span class="badge" style="background:var(--green-bg);color:var(--green)">livre</span>`;
-  else badge = `<span class="badge" style="background:var(--amber-bg);color:var(--amber)">${acts.length} atv</span>`;
-
-  let body;
-  if (isErr) body = `<div class="empty" style="color:var(--red)">${raw.message}</div>`;
-  else if (!acts.length) body = `<div class="empty">Nenhuma atividade</div>`;
-  else body = `<div class="act-list">${acts.map(act => {
-    const s = act.subject || '(sem título)';
-    const t = act.type ? `<span class="type-tag">${act.type}</span>` : '';
-    const deal = act.deal_title || act.org_name || '';
-    const dealHtml = deal ? `<span class="deal-name" title="${deal}">· ${deal}</span>` : '';
-    const brands = parseBrands(act.subject);
-    const brandsHtml = `<span style="background:#EDEAFC;color:#5046B4;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">${brands} 🏷</span>`;
-    return `<div class="act-item ${dayClass}" title="${s}">
-      <div class="act-title">${s}</div>
-      <div class="act-meta">${t}${brandsHtml}${dealHtml}</div>
-    </div>`;
-  }).join('')}</div>`;
+  if (err) {
+    badge = `<span class="badge" style="background:var(--red-bg);color:var(--red)">erro</span>`;
+    body = `<div class="empty" style="color:var(--red)">${err}</div>`;
+  } else if (!acts.length) {
+    badge = `<span class="badge" style="background:var(--green-bg);color:var(--green)">livre</span>`;
+    body = `<div class="empty">Nenhuma atividade</div>`;
+  } else {
+    badge = `<span class="badge" style="background:var(--amber-bg);color:var(--amber)">${acts.length} atv</span>`;
+    body = `<div class="act-list">${acts.map(act => {
+      const s = act.subject || '(sem título)';
+      const t = act.type ? `<span class="type-tag">${act.type}</span>` : '';
+      const deal = act.deal_title || act.org_name || '';
+      const dealHtml = deal ? `<span class="deal-name" title="${deal}">· ${deal}</span>` : '';
+      const brands = parseBrands(act.subject);
+      const brandsHtml = `<span style="background:#EDEAFC;color:#5046B4;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">${brands} 🏷</span>`;
+      return `<div class="act-item ${dayClass}" title="${s}">
+        <div class="act-title">${s}</div>
+        <div class="act-meta">${t}${brandsHtml}${dealHtml}</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
 
   return `<div class="card">
     <div class="card-header">
@@ -422,6 +385,7 @@ function renderDayCard(analyst, acts, dayClass) {
   </div>`;
 }
 
+// ── Render: Acompanhamento ─────────────────────────────────────────────────
 function renderAcomp() {
   const val = document.getElementById('period-sel').value;
   const labels = { this_month:'este mês', last_month:'mês anterior', this_week:'esta semana', last_week:'semana passada' };
@@ -436,22 +400,22 @@ function renderAcomp() {
   document.getElementById('m-period-label').textContent = periodLabel;
   document.getElementById('m-period-label2').textContent = periodLabel;
 
-  // Presentations
-  const niRaw = cachedRaw[USER_NI] || [];
-  const ppts = Array.isArray(niRaw) ? niRaw.filter(a => {
+  // Presentations (elaborar_apresentacao done in period from Nicolas account)
+  const nicolasDone = getAnalystDone(ANALYSTS[0]);
+  const ppts = nicolasDone.filter(a => {
     if ((a.type||'').toLowerCase() !== 'elaborar_apresentacao') return false;
-    if (a.done !== true && a.done !== 1) return false;
     const d = (a.marked_as_done_time||a.update_time||'').substring(0,10);
     return isInPeriod(d);
-  }) : [];
+  });
   document.getElementById('m-ppts').textContent = ppts.length;
 
-  // Build counts per analyst
+  // Per-analyst counts (exclude prazo/deadline)
   const allCounts = ANALYSTS.map(analyst => {
     const doneActs = getAnalystDone(analyst).filter(a => {
-      const d = (a.marked_as_done_time || a.update_time || '').substring(0,10);
       const t = (a.type||'').toLowerCase();
-      return isInPeriod(d) && t !== 'prazo' && t !== 'deadline';
+      if (t === 'prazo' || t === 'deadline') return false;
+      const d = (a.marked_as_done_time || a.update_time || '').substring(0,10);
+      return isInPeriod(d);
     });
     return { analyst, count: doneActs.length, brands: totalBrands(doneActs), acts: doneActs };
   });
@@ -469,10 +433,12 @@ function renderAcomp() {
   // % concluído hoje
   const tod = todayStr();
   const allPending = ANALYSTS.flatMap(a => getAnalystPending(a));
-  const allDoneToday = ANALYSTS.flatMap(a => getAnalystDone(a).filter(x => (x.marked_as_done_time||x.update_time||'').substring(0,10) === tod));
-  const todayTotal = allPending.filter(a => a.due_date === tod).length + allDoneToday.length;
-  const pctToday = todayTotal > 0 ? Math.round((allDoneToday.length / todayTotal) * 100) : 0;
-  document.getElementById('m-pct-today').textContent = todayTotal > 0 ? pctToday + '%' : '—';
+  const allDoneToday = ANALYSTS.flatMap(a => getAnalystDone(a).filter(x =>
+    (x.marked_as_done_time||x.update_time||'').substring(0,10) === tod
+  ));
+  const todayDue = allPending.filter(a => a.due_date === tod).length + allDoneToday.length;
+  document.getElementById('m-pct-today').textContent = todayDue > 0
+    ? Math.round((allDoneToday.length / todayDue) * 100) + '%' : '—';
 
   // Atrasadas
   const overdue = allPending.filter(a => a.due_date && a.due_date < tod).length;
@@ -504,6 +470,7 @@ function renderAcomp() {
     </div>`;
   }).join('');
 
+  // Ranking
   const posClass = ['p1','p2','p3',''];
   document.getElementById('ranking-grid').innerHTML = counts.map((c,i) => {
     const pct = max > 0 ? Math.round((c.brands/max)*100) : 0;
@@ -518,6 +485,7 @@ function renderAcomp() {
     </div>`;
   }).join('');
 
+  // Done list
   document.getElementById('done-grid').innerHTML = counts.map(c => {
     const recent = [...c.acts]
       .sort((a,b) => (b.marked_as_done_time||b.update_time||'').localeCompare(a.marked_as_done_time||a.update_time||''))
@@ -542,8 +510,8 @@ function renderAcomp() {
     </div>`;
   }).join('');
 }
+
 window.addEventListener('load', loadAll);
 </script>
 </body>
 </html>
-
